@@ -2,15 +2,15 @@
 import { createLogger, format } from 'winston';
 
 import { LEVEL } from 'triple-beam';
+import chalk from 'chalk';
 
 import Transport from 'winston-transport';
 
-// inspired by https://github.com/winstonjs/winston/issues/1544#issuecomment-499362387
-export class SimpleConsoleTransport extends Transport {
+class SimpleConsoleTransport extends Transport {
+    private warning = chalk.hex('#FFA500');
+
     private getLogMethod(level: string) {
-        if (level === 'debug') {
-            return console.debug;
-        } else if (level === 'info') {
+        if (level === 'info') {
             return console.info;
         } else if (level === 'critical' || level === 'error') {
             return console.error;
@@ -20,26 +20,54 @@ export class SimpleConsoleTransport extends Transport {
             return console.log;
         }
     }
-
     override log(info: any, callback: any): void {
         setImmediate(() => this.emit('logged', info));
-        const logMethod = this.getLogMethod(info[LEVEL]);
-        console.log(info);
-        const { level, timestamp, service, message, logStack, ...metadata } = info;
 
-        if (logStack) {
-            logMethod(`${timestamp}`, message, logStack);
+        const logMethod = this.getLogMethod(info[LEVEL]);
+
+        const { level, timestamp, service, message, stack, ...etc } = info;
+
+        if (stack) {
+            logMethod(
+                `${timestamp} -> [${this.colorlevelStr(level, level)}]   message:[${this.colorlevelStr(message, level)}]`,
+                this.colorlevelStr(stack, level)
+            );
         } else {
-            logMethod(`${timestamp} [${service}] -> message: [${message}]}`);
-            if (Object.keys(metadata).length > 0) logMethod(metadata);
+            const etcObj = Object.entries(etc).reduce((prev, [keyName, value]) => {
+                return { ...prev, [keyName]: value };
+            }, {});
+
+            logMethod(
+                `${timestamp} -> [${this.colorlevelStr(level, level)}]  [${this.colorlevelStr(service, level)}]  message:[${this.colorlevelStr(
+                    message,
+                    level
+                )}]${Object.keys(etcObj).length ? ' -> ' + this.colorlevelStr(JSON.stringify(etcObj), level) : ''}`
+            );
         }
         if (callback) {
             callback();
         }
     }
+
+    private colorlevelStr(str: string, level: string) {
+        const upLevel = level.toLocaleUpperCase();
+        let tempStr = str;
+        switch (upLevel) {
+            case 'INFO':
+                tempStr = chalk.blue(str);
+                break;
+            case 'WARN':
+                tempStr = this.warning(str);
+                break;
+            case 'ERROR':
+                tempStr = chalk.red(str);
+                break;
+        }
+        return tempStr;
+    }
 }
 
-export const logger = createLogger({
+const logger = createLogger({
     level: 'debug',
     format: format.combine(format.errors({ stack: true }), format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), format.splat()),
 
@@ -47,19 +75,8 @@ export const logger = createLogger({
     transports: [
         new SimpleConsoleTransport({
             level: 'debug',
-            format: format.combine(
-                format((info) => {
-                    info.level = info.level.toUpperCase();
-                    return info;
-                })()
-            ),
         }),
     ],
 });
 
-// export class MyStreamer {
-//     write(text: any) {
-//         // console.log('g',text);
-//         logger.info(text);
-//     }
-// }
+export default logger;

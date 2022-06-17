@@ -3,6 +3,7 @@
     "version": "0.0.1",
     "description": "template for typescript ",
     "main": "index.js",
+    "node": ">=16.0.0",
     "scripts": {
         "test": "vitest",
         "coverage": "vitest run --coverage",
@@ -36,6 +37,7 @@
         "vitest": "^0.15.0"
     },
     "dependencies": {
+        "chalk": "^5.0.1",
         "winston": "^3.7.2"
     }
 }
