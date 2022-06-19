@@ -22,7 +22,6 @@ class SimpleConsoleTransport extends Transport {
     }
     override log(info: any, callback: any): void {
         setImmediate(() => this.emit('logged', info));
-
         const logMethod = this.getLogMethod(info[LEVEL]);
 
         const { level, timestamp, service, message, stack, ...etc } = info;
@@ -75,6 +74,7 @@ const logger = createLogger({
     transports: [
         new SimpleConsoleTransport({
             level: 'debug',
+            silent: false,
         }),
     ],
 });

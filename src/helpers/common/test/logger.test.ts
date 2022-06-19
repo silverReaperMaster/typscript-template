@@ -11,6 +11,9 @@ describe('logger', () => {
         //
     });
 
+    beforeAll(()=> {
+    // 
+    });
     afterAll(() => {
         vi.restoreAllMocks();
     });

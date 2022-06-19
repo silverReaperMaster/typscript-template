@@ -5,9 +5,11 @@ export default defineConfig({
     // ...
     coverage: {
       reporter: ['text', 'json', 'html'],
-      clean:true,
+      clean: true,
       all: true,
-      src: ['./src']
+      src: ['./src'],
+      "100": true,
+      
     },
   },
 })
