@@ -7,7 +7,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "sourceMap": true,
-
+    "strict": true
   },
   "ts-node": {
     "transpileOnly": true,
