@@ -8,7 +8,7 @@
         "test": "vitest",
         "coverage": "cross-env FORCE_COLOR=0 vitest run --coverage",
         "test:ui": "npx vitest --ui",
-        "dev": "cross-env NODE_OPTIONS=--trace-deprecation ts-node ./src/ index.ts",
+        "dev": "cross-env NODE_OPTIONS=--trace-deprecation nodemon",
         "start": "",
         "lint": "eslint .",
         "check-rules": "npx eslint-config-prettier ./src/index.ts"
@@ -33,6 +33,7 @@
         "eslint": "^8.17.0",
         "eslint-config-prettier": "^8.5.0",
         "eslint-plugin-no-loops": "^0.3.0",
+        "nodemon": "^2.0.19",
         "pre-commit": "^1.2.2",
         "prettier": "2.7.0",
         "ts-node": "^10.8.1",
@@ -45,9 +46,23 @@
         "zod": "^3.17.3"
     },
     "pre-commit": {
-        "run": [
-        ],
+        "run": [],
         "silent": true,
         "colors": false
+    },
+    "nodemonConfig": {
+        "ignore": [
+            "test/*",
+            "docs/*",
+            "node_modules/",
+            "build/*"
+        ],
+        "delay": 1000,
+        "watch": [
+            "./src/*"
+        ],
+        "execMap": {
+            "ts": "ts-node"
+        }
     }
 }
